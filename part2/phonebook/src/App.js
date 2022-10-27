@@ -12,12 +12,17 @@ const App = () => {
 
   }
 
+
 const onAdd=(e)=>{
   e.preventDefault()
  const newObject = {
   name : newName
  }
-  setPersons([...persons,newObject])
+ let check = persons.find((person)=> person.name===newName)
+
+check?alert(`${newName} is already added to phonebook`)
+:setPersons([...persons,newObject])
+ 
 
   setNewName("")
 }
