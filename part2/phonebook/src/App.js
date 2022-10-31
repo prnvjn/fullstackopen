@@ -23,13 +23,21 @@ const onAdd=(e)=>{
   number: newNumber,
   id: persons.length+1
  }
+
+
+
  let check = persons.find((person)=> person.name===newName)
 
 check?alert(`${newName} is already added to phonebook`)
-:setPersons([...persons,newObject])
-
-setNewNumber("")
+:axios
+.post("http://localhost:3001/persons",newObject)
+.then(res=>{setPersons([...persons,newObject])
+  setNewNumber("")
   setNewName("")
+})
+
+
+
 }
 
   return (
