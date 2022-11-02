@@ -1,28 +1,33 @@
 import { useState, useEffect } from 'react'
+import { Contact } from './components/Contact'
+import { Notification } from './components/Notification'
 import allService from './services/service'
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [notification,setNotification]=useState(null)
+  let lastId =persons.length!==0?persons[persons.length-1]:0
+ 
   const handleChange =(e)=>{
   
    setNewName(e.target.value)
 
   }
 useEffect(()=>{
-  allService
-    .getAll()
-    .then((res)=>setPersons(res.data))
+  init()
 
 },[])
-
+const init = ()=>{allService
+  .getAll()
+  .then((res)=>setPersons(res.data))}
 const onAdd=(e)=>{
   e.preventDefault()
  const newObject = {
   name : newName,
   number: newNumber,
-  id: persons.length+1
+  id: lastId.id+1
  }
 
 
@@ -32,24 +37,44 @@ const onAdd=(e)=>{
 check?alert(`${newName} is already added to phonebook`)
 :(allService
 .create(newObject)
-.then(res=>{setPersons([...persons,newObject])
+.then(res=>{setPersons([...persons,newObject]
+)
+  setNotification(newObject.name)
+
+  setTimeout(() => {
+    setNotification(null)
+  }, 2000);
+
+
   setNewNumber("")
   setNewName("")
-}))
+})
+.catch(err=>console.log(err))
+)
+}
+const filterNames = newFilter === ''?persons:persons.filter((person)=>person.name.toUpperCase().match(newFilter.toUpperCase()))
 
 
+const deleteButton =(id)=>{
+if(window.confirm("Are you sure?")){allService
+.deletation(id)
+.then(res=>init())}
 
 }
+
+
+
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
       <form>
         <div>
           filter show with <input onChange={(e)=>setNewFilter(e.target.value)} />
-          { 
-          console.log(persons.filter((person)=>person.name.toUpperCase().match(newFilter.toUpperCase())))}
+      
         </div>
+        <h2>Add a new number</h2>
         <div>
           Name: <input value={newName} onChange={handleChange}/> <br></br>
           Number: <input value={newNumber} onChange={(e)=>setNewNumber(e.target.value)}/>
@@ -61,7 +86,7 @@ check?alert(`${newName} is already added to phonebook`)
       <h2>Numbers</h2>
       
       {
-        persons.map((person)=><li key={person.id} >{person.name}       {person.number}</li>)
+        filterNames.map((person)=><Contact key={person.id} name={person.name} number={person.number} del={()=>deleteButton(person.id)} />)
 
       }
   
