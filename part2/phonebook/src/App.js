@@ -44,7 +44,7 @@ check?alert(`${newName} is already added to phonebook`)
   setTimeout(() => {
     setNotification(null)
   }, 2000);
-
+init()
 
   setNewNumber("")
   setNewName("")
